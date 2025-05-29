@@ -1,4 +1,4 @@
-# Raspberry PI GPS/GNSS with PPS
+# Raspberry PI GPS/GNSS based NTP with PPS (GPSD and Chrony)
 
 
 ## Resources: 
@@ -22,6 +22,10 @@ Containerization efforts
 	- When chrony is configured to use refclock PPS an error is kicked out saying that module is not compiled in 
 
    		> 2025-05-28T22:53:23Z Fatal error : refclock driver PPS is not compiled in
+
+     	- Review of the build logs from the alpine APK chrony respository build indicates that refclock is compiled in.  This determination is based on the fact that timepps.h is found and included in the build log.
+        - APK GPSD info: https://pkgs.alpinelinux.org/package/edge/main/x86/gpsd
+  
 	
  	- When GPSD container is started the follow warnings are displayed: 
 			
@@ -50,3 +54,18 @@ Containerization efforts
 	> /usr/sbin/chronyd -u chrony -d -x -L 3
  - ERROR response of 	
  	> 2025-05-28T22:53:23Z Fatal error : refclock driver PPS is not compiled in!
+
+## Next steps
+
+- investigate further the GPSD warnings about KPPS and PPS and determine what needs to be done to fix
+- fork repo to use another version of linux (debian based) which may have more default functionality to see if that will fix issues
+
+## To do once issues are resolved: 
+- setup chrony configuration file properly
+- implement startup.sh to launch gpsd and chrony when container is brought up
+- dial back docker --privlidged flag and make sure everything still works
+- setup alpine chrony only container for remote NTP side
+
+
+
+
