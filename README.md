@@ -44,7 +44,7 @@ Containerization efforts
 - Check PPS
 	> Sudo ppstest /dev/pps0
 - Check gps
-	> Cgps
+	> Cgps <br>
 	> Gpsmon
 - Try to launch chrony
 	> /usr/sbin/chronyd -u chrony -d -x -L 3
