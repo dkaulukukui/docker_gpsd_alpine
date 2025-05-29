@@ -1,20 +1,37 @@
+
 FROM alpine:latest
 
-ARG BUILD_DATE
+# Print the UID and GID
+# CMD sh -c "echo 'Inside Container:' && echo 'User: $(whoami) UID: $(id -u) GID: $(id -g)'"
 
-# first, a bit about this container
-LABEL build_info="gpsd build-date:- ${BUILD_DATE}"
-LABEL maintainer="Donald Kaulukukui"
-LABEL documentation="None"
+# install packages as root
+#USER root # install packages as root
 
-# install chrony
-RUN apk add --no-cache gpsd
+# Update apk repositories and install gpsd
+RUN apk update && \
+    apk add --no-cache \
+    pps-tools \
+    gpsd \
+    gpsd-clients \
+    chrony \
+    bash \
+    sudo \
+    nano \
+    && rm -rf /var/cache/apk/*
 
-# script to configure/startup gpsd
-#COPY assets/startup.sh /opt/startup.sh
-
-# ntp port
+# Expose the gpsd port (2947 is the default gpsd port)
 EXPOSE 2947
 
-# start chronyd in the foreground
-ENTRYPOINT ["/bin/sh", "-c", "/sbin/syslogd -S -O - -n & exec /usr/sbin/gpsd -N -n -G ${*}","--"]
+#manually add in timeapps.h in order to try to get the pps working (not sure if this changes anything)
+COPY timeapps.h /sys/timeapps.h
+
+# Copy chrony config file
+COPY chrony.conf /etc/chrony/chrony.conf
+
+# Add entrypoint script (as before)
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
+
